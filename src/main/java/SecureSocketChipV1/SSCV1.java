@@ -38,6 +38,12 @@ public class SSCV1 implements SSCVCommand{
 
     @Override
     public void onCommand(SSCV1 sscv1, String command, String[] args) {
+        if(args.length == 0){
+            if(command.equalsIgnoreCase("PING")){
+                getCom().sendMessage("PONG");
+                return;
+            }
+        }
         if(args.length == 1){
             if(command.equalsIgnoreCase("SK")){
                 new SendKeyCommand(this, command, args);
