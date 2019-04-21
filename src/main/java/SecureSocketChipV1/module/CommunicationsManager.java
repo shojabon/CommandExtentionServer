@@ -1,6 +1,8 @@
 package SecureSocketChipV1.module;
 
+import SecureSocketChipV1.EventClasses.SSCClientDisconnectEvent;
 import SecureSocketChipV1.SSCV1;
+import SecureSocketChipV1.interfaces.SSCEvent;
 
 import java.io.*;
 import java.util.Arrays;
@@ -63,7 +65,6 @@ public class CommunicationsManager{
                 try {
                     String data;
                     while ((data = br.readLine()) != null) {
-                        System.out.println(data);
                         String[] a = data.split(" ");
                         main.getCommandManager().executeCommand(main, a[0], Arrays.copyOfRange(a, 1, a.length));
                     }
@@ -77,6 +78,9 @@ public class CommunicationsManager{
 
     public void closeCommunication(){
         if(!communicationsOpen) return;
+        for(SSCEvent event: main.getEventHandler()){
+            event.onClientDisconnect(new SSCClientDisconnectEvent(main));
+        }
         communicationsOpen = false;
     }
 

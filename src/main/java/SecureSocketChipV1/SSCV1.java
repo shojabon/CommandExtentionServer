@@ -1,5 +1,6 @@
 package SecureSocketChipV1;
 
+import SecureSocketChipV1.EventClasses.SSCClientConnectEvent;
 import SecureSocketChipV1.interfaces.SSCEvent;
 import SecureSocketChipV1.interfaces.SSCVCommand;
 import SecureSocketChipV1.module.BaseCommand.SendKeyCommand;
@@ -34,6 +35,9 @@ public class SSCV1 implements SSCVCommand{
         this.encryptionManager = new EncryptionManager(this);
         this.baseCommandHandler = this;
         this.protocolManager = new ProtocolManager(this);
+        for(SSCEvent event: eventHandler){
+            event.onClientConnect(new SSCClientConnectEvent(this));
+        }
     }
 
     @Override
@@ -65,7 +69,7 @@ public class SSCV1 implements SSCVCommand{
         return eventHandler;
     }
 
-    public void registerCommandHandler(SSCEvent event){
+    public void registerEvent(SSCEvent event){
         eventHandler.add(event);
     }
 

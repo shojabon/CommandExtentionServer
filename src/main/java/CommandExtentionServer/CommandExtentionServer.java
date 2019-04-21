@@ -1,6 +1,11 @@
 package CommandExtentionServer;
 
+import CommandExtentionServer.Commands.CommandExtentionServerDefaultCommands;
+import SecureSocketChipV1.EventClasses.SSCClientConnectEvent;
+import SecureSocketChipV1.EventClasses.SSCClientDisconnectEvent;
+import SecureSocketChipV1.EventClasses.SSCCommandExecuteEvent;
 import SecureSocketChipV1.SSCV1;
+import SecureSocketChipV1.interfaces.SSCEvent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,30 +13,32 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
-public class CommandExtentionServer{
+public class CommandExtentionServer extends SSCEvent{
 
     ServerSocket socket;
     boolean connectionOpen = false;
 
     boolean accecptCommand = false;
 
+    String localCommandClientIp;
+
     SSCV1 localClient;
 
-    List<SSCV1> clientList = new ArrayList<>();
+    HashMap<String, SSCV1> clientList = new HashMap<>();
 
     int port;
 
     public CommandExtentionServer(int port){
         this.port = port;
+        log("Starting Server...");
         createFolderIfNotExist(new File("plugins"));
         try {
+            log("Starting Local Command Client");
             socket = new ServerSocket(port);
             openConnection();
+            log("Server Started");
             openCommandConnection();
         } catch (IOException e) {
             e.printStackTrace();
@@ -44,7 +51,9 @@ public class CommandExtentionServer{
         if(accecptCommand) return;
         accecptCommand = true;
         try {
-            localClient = new SSCV1(new Socket("127.0.0.1", port));
+            SSCV1 commandClient = new SSCV1(new Socket("127.0.0.1", port));
+            localClient = commandClient;
+            localCommandClientIp = commandClient.getSocket().getRemoteSocketAddress().toString();
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             while(accecptCommand){
                 String input = br.readLine();
@@ -60,15 +69,20 @@ public class CommandExtentionServer{
         accecptCommand = false;
     }
 
-
-
+    public void log(String message){
+        System.out.println("[INFO] " + message);
+    }
 
     public void openConnection(){
         connectionOpen = true;
         Thread t = new Thread(() -> {
             while (connectionOpen){
                 try {
-                    clientList.add(new SSCV1(socket.accept()));
+                    Socket cSock = socket.accept();
+                    SSCV1 clientChip = new SSCV1(cSock);
+                    //clientChip.addCommandHandler(new CommandExtentionServerDefaultCommands(this));
+                    clientChip.registerEvent(this);
+                    clientList.put(cSock.getRemoteSocketAddress().toString(),clientChip);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -77,6 +91,23 @@ public class CommandExtentionServer{
         t.start();
     }
 
+    @Override
+    public void onCommandExecute(SSCCommandExecuteEvent e) {
+        log(e.getChip().getSocket().getInetAddress().getHostAddress() + " Executed " + e.getCommand());
+        return;
+    }
+
+    @Override
+    public void onClientConnect(SSCClientConnectEvent e) {
+        log(e.getChip().getSocket().getRemoteSocketAddress() + " Connected to server");
+        return;
+    }
+
+    @Override
+    public void onClientDisconnect(SSCClientDisconnectEvent e) {
+        log(e.getChip().getSocket().getRemoteSocketAddress() + " Disconnected from server");
+        clientList.remove(e.getChip().getSocket().getRemoteSocketAddress().toString());
+    }
 
     public void closeConnection(){
         connectionOpen = false;
@@ -87,4 +118,7 @@ public class CommandExtentionServer{
         return file.mkdir();
     }
 
+    public HashMap<String, SSCV1> getClientList() {
+        return clientList;
+    }
 }
