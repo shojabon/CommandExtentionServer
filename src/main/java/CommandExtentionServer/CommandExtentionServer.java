@@ -79,9 +79,8 @@ public class CommandExtentionServer extends SSCEvent{
             while (connectionOpen){
                 try {
                     Socket cSock = socket.accept();
-                    SSCV1 clientChip = new SSCV1(cSock);
+                    SSCV1 clientChip = new SSCV1(cSock, this);
                     //clientChip.addCommandHandler(new CommandExtentionServerDefaultCommands(this));
-                    clientChip.registerEvent(this);
                     clientList.put(cSock.getRemoteSocketAddress().toString(),clientChip);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -93,19 +92,18 @@ public class CommandExtentionServer extends SSCEvent{
 
     @Override
     public void onCommandExecute(SSCCommandExecuteEvent e) {
-        log(e.getChip().getSocket().getInetAddress().getHostAddress() + " Executed " + e.getCommand());
+        log(e.getChip().getSocket().getRemoteSocketAddress() + " Executed " + e.getCommand());
         return;
     }
 
     @Override
     public void onClientConnect(SSCClientConnectEvent e) {
-        log(e.getChip().getSocket().getRemoteSocketAddress() + " Connected to server");
-        return;
+        log(e.getChip().getSocket().getRemoteSocketAddress().toString() + " Connected to server");
     }
 
     @Override
     public void onClientDisconnect(SSCClientDisconnectEvent e) {
-        log(e.getChip().getSocket().getRemoteSocketAddress() + " Disconnected from server");
+        log(e.getChip().getSocket().getRemoteSocketAddress().toString() + " Disconnected from server");
         clientList.remove(e.getChip().getSocket().getRemoteSocketAddress().toString());
     }
 

@@ -35,8 +35,19 @@ public class SSCV1 implements SSCVCommand{
         this.encryptionManager = new EncryptionManager(this);
         this.baseCommandHandler = this;
         this.protocolManager = new ProtocolManager(this);
-        for(SSCEvent event: eventHandler){
-            event.onClientConnect(new SSCClientConnectEvent(this));
+    }
+
+    public SSCV1(Socket socket, SSCEvent event){
+        this.socket = socket;
+        this.communicationsManager = new CommunicationsManager(this);
+        this.communicationsManager.openCommunication();
+        this.commandManager = new CommandManager(this);
+        this.encryptionManager = new EncryptionManager(this);
+        this.baseCommandHandler = this;
+        this.protocolManager = new ProtocolManager(this);
+        eventHandler.add(event);
+        for(SSCEvent even: eventHandler){
+            even.onClientConnect(new SSCClientConnectEvent(this));
         }
     }
 
