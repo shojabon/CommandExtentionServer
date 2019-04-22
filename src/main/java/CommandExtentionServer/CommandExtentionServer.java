@@ -1,6 +1,7 @@
 package CommandExtentionServer;
 
 import CommandExtentionServer.Commands.CommandExtentionServerDefaultCommands;
+import SecureSocketChipV1.Enums.SSCV1Mode;
 import SecureSocketChipV1.EventClasses.SSCClientConnectEvent;
 import SecureSocketChipV1.EventClasses.SSCClientDisconnectEvent;
 import SecureSocketChipV1.EventClasses.SSCCommandExecuteEvent;
@@ -51,7 +52,7 @@ public class CommandExtentionServer extends SSCEvent{
         if(accecptCommand) return;
         accecptCommand = true;
         try {
-            SSCV1 commandClient = new SSCV1(new Socket("127.0.0.1", port));
+            SSCV1 commandClient = new SSCV1(new Socket("127.0.0.1", port), SSCV1Mode.SERVER);
             localClient = commandClient;
             localCommandClientIp = commandClient.getSocket().getRemoteSocketAddress().toString();
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -79,7 +80,7 @@ public class CommandExtentionServer extends SSCEvent{
             while (connectionOpen){
                 try {
                     Socket cSock = socket.accept();
-                    SSCV1 clientChip = new SSCV1(cSock, this);
+                    SSCV1 clientChip = new SSCV1(cSock, SSCV1Mode.SERVER,this);
                     //clientChip.addCommandHandler(new CommandExtentionServerDefaultCommands(this));
                     clientList.put(cSock.getRemoteSocketAddress().toString(),clientChip);
                 } catch (IOException e) {

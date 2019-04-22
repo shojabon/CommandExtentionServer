@@ -65,8 +65,15 @@ public class CommunicationsManager{
                 try {
                     String data;
                     while ((data = br.readLine()) != null) {
-                        String[] a = data.split(" ");
-                        main.getCommandManager().executeCommand(main, a[0], Arrays.copyOfRange(a, 1, a.length));
+                        System.out.println(data);
+                        if(main.getCom().communicationEncrypted){
+                            data = main.getEncryptionManager().decryptMessage(data);
+                            String[] a = data.split(" ");
+                            main.getCommandManager().executeCommand(main, a[0], Arrays.copyOfRange(a, 1, a.length));
+                        }else{
+                            String[] a = data.split(" ");
+                            main.getCommandManager().executeCommand(main, a[0], Arrays.copyOfRange(a, 1, a.length));
+                        }
                     }
                     closeCommunication();
                 }catch (IOException e){
