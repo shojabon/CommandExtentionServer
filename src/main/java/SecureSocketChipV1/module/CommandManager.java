@@ -22,10 +22,7 @@ public class CommandManager {
         if(args.length >= 1){
             if(parseUUID(args[0]) != null){
                 uu = parseUUID(args[0]);
-                List<String> list = Arrays.asList(args);
-                list.remove(0);
-                String[] array = list.toArray(new String[0]);
-                args = array;
+                args = Arrays.copyOfRange(args, 1, args.length);
             }
         }
         main.getBaseCommandHandler().onCommand(sscv1, command, args, uu);
@@ -40,10 +37,10 @@ public class CommandManager {
     private UUID parseUUID(String uuid){
         try {
             UUID reUUID = UUID.fromString(uuid);
+            return reUUID;
         }catch (Exception e){
             return null;
         }
-        return null;
     }
 
 
