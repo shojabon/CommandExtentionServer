@@ -93,8 +93,14 @@ public class CommandExtentionServer extends SSCEvent{
 
     @Override
     public void onCommandExecute(SSCCommandExecuteEvent e) {
-        log(e.getChip().getSocket().getRemoteSocketAddress() + " Executed " + e.getCommand());
-        return;
+        StringBuilder a  = new StringBuilder();
+        for(String b : e.getArgs()){
+            a.append(" ").append(b);
+        }
+        log(e.getChip().getSocket().getRemoteSocketAddress() + " Executed " + e.getCommand() + a.toString());
+        if(e.getUuid() != null){
+            log(e.getUuid() + " C");
+        }
     }
 
     @Override

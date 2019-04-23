@@ -65,7 +65,6 @@ public class CommunicationsManager{
                 try {
                     String data;
                     while ((data = br.readLine()) != null) {
-                        System.out.println(data);
                         if(main.getCom().communicationEncrypted){
                             data = main.getEncryptionManager().decryptMessage(data);
                             String[] a = data.split(" ");

@@ -13,6 +13,7 @@ import SecureSocketChipV1.module.ProtocolManager;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class SSCV1 implements SSCVCommand{
 
@@ -57,7 +58,7 @@ public class SSCV1 implements SSCVCommand{
     }
 
     @Override
-    public void onCommand(SSCV1 sscv1, String command, String[] args) {
+    public void onCommand(SSCV1 sscv1, String command, String[] args, UUID uuid) {
         if(args.length == 0){
             if(command.equalsIgnoreCase("PING")){
                 getCom().sendMessage("PONG");
