@@ -7,6 +7,7 @@ import SecureSocketChipV1.EventClasses.SSCClientDisconnectEvent;
 import SecureSocketChipV1.EventClasses.SSCCommandExecuteEvent;
 import SecureSocketChipV1.SSCV1;
 import SecureSocketChipV1.interfaces.SSCEvent;
+import SecureSocketChipV1.interfaces.SSCVCommand;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +17,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-public class CommandExtentionServer extends SSCEvent{
+public class CommandExtentionServer extends SSCEvent {
 
     ServerSocket socket;
     boolean connectionOpen = false;
@@ -52,7 +53,7 @@ public class CommandExtentionServer extends SSCEvent{
         if(accecptCommand) return;
         accecptCommand = true;
         try {
-            SSCV1 commandClient = new SSCV1(new Socket("127.0.0.1", port), SSCV1Mode.SERVER);
+            SSCV1 commandClient = new SSCV1(new Socket("127.0.0.1", port), SSCV1Mode.SERVER, null, null);
             localClient = commandClient;
             localCommandClientIp = commandClient.getSocket().getRemoteSocketAddress().toString();
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -80,7 +81,7 @@ public class CommandExtentionServer extends SSCEvent{
             while (connectionOpen){
                 try {
                     Socket cSock = socket.accept();
-                    SSCV1 clientChip = new SSCV1(cSock, SSCV1Mode.SERVER,this);
+                    SSCV1 clientChip = new SSCV1(cSock, SSCV1Mode.SERVER,null,this);
                     //clientChip.addCommandHandler(new CommandExtentionServerDefaultCommands(this));
                     clientList.put(cSock.getRemoteSocketAddress().toString(),clientChip);
                 } catch (IOException e) {
@@ -114,6 +115,8 @@ public class CommandExtentionServer extends SSCEvent{
         clientList.remove(e.getChip().getSocket().getRemoteSocketAddress().toString());
     }
 
+
+
     public void closeConnection(){
         connectionOpen = false;
     }
@@ -126,4 +129,5 @@ public class CommandExtentionServer extends SSCEvent{
     public HashMap<String, SSCV1> getClientList() {
         return clientList;
     }
+
 }

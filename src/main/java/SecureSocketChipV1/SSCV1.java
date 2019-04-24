@@ -4,6 +4,7 @@ import SecureSocketChipV1.Enums.SSCV1Mode;
 import SecureSocketChipV1.EventClasses.SSCClientConnectEvent;
 import SecureSocketChipV1.interfaces.SSCEvent;
 import SecureSocketChipV1.interfaces.SSCVCommand;
+import SecureSocketChipV1.module.BaseCommand.ReturnCommand;
 import SecureSocketChipV1.module.BaseCommand.SendKeyCommand;
 import SecureSocketChipV1.module.CommandManager;
 import SecureSocketChipV1.module.CommunicationsManager;
@@ -12,6 +13,7 @@ import SecureSocketChipV1.module.ProtocolManager;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,18 +33,9 @@ public class SSCV1 implements SSCVCommand{
 
     SSCV1Mode mode;
 
-    public SSCV1(Socket socket, SSCV1Mode mode){
-        this.socket = socket;
-        this.mode = mode;
-        this.communicationsManager = new CommunicationsManager(this);
-        this.communicationsManager.openCommunication();
-        this.commandManager = new CommandManager(this);
-        this.encryptionManager = new EncryptionManager(this);
-        this.baseCommandHandler = this;
-        this.protocolManager = new ProtocolManager(this);
-    }
+    HashMap<String, String> returnMap = new HashMap<>();
 
-    public SSCV1(Socket socket, SSCV1Mode mode, SSCEvent event) {
+    public SSCV1(Socket socket, SSCV1Mode mode, SSCVCommand command, SSCEvent event) {
         this.socket = socket;
         this.mode = mode;
         this.communicationsManager = new CommunicationsManager(this);
@@ -51,7 +44,8 @@ public class SSCV1 implements SSCVCommand{
         this.encryptionManager = new EncryptionManager(this);
         this.baseCommandHandler = this;
         this.protocolManager = new ProtocolManager(this);
-        eventHandler.add(event);
+        if(event != null) eventHandler.add(event);
+        if(command != null) this.commandHandler.add(command);
         for (SSCEvent even : eventHandler) {
             even.onClientConnect(new SSCClientConnectEvent(this));
         }
@@ -64,10 +58,18 @@ public class SSCV1 implements SSCVCommand{
                 getCom().sendMessage("PONG");
                 return;
             }
+            if(command.equalsIgnoreCase("test")){
+                getCom().sendMessage("RET " + uuid.toString() + " testa");
+                return;
+            }
         }
         if(args.length == 1){
             if(command.equalsIgnoreCase("SK")){
                 new SendKeyCommand(this, command, args);
+                return;
+            }
+            if(command.equalsIgnoreCase("RET")){
+                new ReturnCommand(this, command, args, uuid);
                 return;
             }
         }
@@ -116,5 +118,21 @@ public class SSCV1 implements SSCVCommand{
 
     public ProtocolManager getProtocolManager() {
         return protocolManager;
+    }
+
+    public void registerReturnValue(String key, String value){
+        returnMap.put(key, value);
+    }
+
+    public boolean ifReturnReturned(String key){
+        return returnMap.containsKey(key);
+    }
+
+    public String getReturn(String key){
+        return returnMap.get(key);
+    }
+
+    public void removeReturnMap(String key){
+        returnMap.remove(key);
     }
 }

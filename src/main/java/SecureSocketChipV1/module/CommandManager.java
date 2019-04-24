@@ -6,7 +6,6 @@ import SecureSocketChipV1.interfaces.SSCEvent;
 import SecureSocketChipV1.interfaces.SSCVCommand;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class CommandManager {
@@ -36,8 +35,7 @@ public class CommandManager {
 
     private UUID parseUUID(String uuid){
         try {
-            UUID reUUID = UUID.fromString(uuid);
-            return reUUID;
+            return UUID.fromString(uuid);
         }catch (Exception e){
             return null;
         }
