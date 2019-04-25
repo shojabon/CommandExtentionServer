@@ -17,7 +17,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-public class CommandExtentionServer extends SSCEvent {
+public class CommandExtentionServer extends SSCEvent implements SSCVCommand{
 
     ServerSocket socket;
     boolean connectionOpen = false;
@@ -53,7 +53,7 @@ public class CommandExtentionServer extends SSCEvent {
         if(accecptCommand) return;
         accecptCommand = true;
         try {
-            SSCV1 commandClient = new SSCV1(new Socket("127.0.0.1", port), SSCV1Mode.SERVER, null, null);
+            SSCV1 commandClient = new SSCV1(new Socket("127.0.0.1", port), SSCV1Mode.SERVER, this, null);
             localClient = commandClient;
             localCommandClientIp = commandClient.getSocket().getRemoteSocketAddress().toString();
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -81,7 +81,7 @@ public class CommandExtentionServer extends SSCEvent {
             while (connectionOpen){
                 try {
                     Socket cSock = socket.accept();
-                    SSCV1 clientChip = new SSCV1(cSock, SSCV1Mode.SERVER,null,this);
+                    SSCV1 clientChip = new SSCV1(cSock, SSCV1Mode.SERVER,this,this);
                     //clientChip.addCommandHandler(new CommandExtentionServerDefaultCommands(this));
                     clientList.put(cSock.getRemoteSocketAddress().toString(),clientChip);
                 } catch (IOException e) {
@@ -130,4 +130,12 @@ public class CommandExtentionServer extends SSCEvent {
         return clientList;
     }
 
+    @Override
+    public void onCommand(SSCV1 sscv1, String command, String[] args, UUID uuid) {
+        if(args.length == 0){
+            if(command.equalsIgnoreCase("test")){
+                sscv1.getCom().sendMessage("RET " + uuid + " testa");
+            }
+        }
+    }
 }

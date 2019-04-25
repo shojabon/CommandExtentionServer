@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class SSCV1 implements SSCVCommand{
+public class SSCV1 implements SSCVCommand {
 
     Socket socket;
     CommunicationsManager communicationsManager;
@@ -36,6 +36,8 @@ public class SSCV1 implements SSCVCommand{
     HashMap<String, String> returnMap = new HashMap<>();
 
     public SSCV1(Socket socket, SSCV1Mode mode, SSCVCommand command, SSCEvent event) {
+        if(event != null) eventHandler.add(event);
+        if(command != null) this.commandHandler.add(command);
         this.socket = socket;
         this.mode = mode;
         this.communicationsManager = new CommunicationsManager(this);
@@ -44,8 +46,6 @@ public class SSCV1 implements SSCVCommand{
         this.encryptionManager = new EncryptionManager(this);
         this.baseCommandHandler = this;
         this.protocolManager = new ProtocolManager(this);
-        if(event != null) eventHandler.add(event);
-        if(command != null) this.commandHandler.add(command);
         for (SSCEvent even : eventHandler) {
             even.onClientConnect(new SSCClientConnectEvent(this));
         }
@@ -56,10 +56,6 @@ public class SSCV1 implements SSCVCommand{
         if(args.length == 0){
             if(command.equalsIgnoreCase("PING")){
                 getCom().sendMessage("PONG");
-                return;
-            }
-            if(command.equalsIgnoreCase("test")){
-                getCom().sendMessage("RET " + uuid.toString() + " testa");
                 return;
             }
         }
