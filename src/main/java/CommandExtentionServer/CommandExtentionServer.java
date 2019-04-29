@@ -92,28 +92,6 @@ public class CommandExtentionServer extends SSCEvent implements SSCVCommand{
         t.start();
     }
 
-    @Override
-    public void onCommandExecute(SSCCommandExecuteEvent e) {
-        StringBuilder a  = new StringBuilder();
-        for(String b : e.getArgs()){
-            a.append(" ").append(b);
-        }
-        log(e.getChip().getSocket().getRemoteSocketAddress() + " Executed " + e.getCommand() + a.toString());
-        if(e.getUuid() != null){
-            log(e.getUuid() + " C");
-        }
-    }
-
-    @Override
-    public void onClientConnect(SSCClientConnectEvent e) {
-        log(e.getChip().getSocket().getRemoteSocketAddress().toString() + " Connected to server");
-    }
-
-    @Override
-    public void onClientDisconnect(SSCClientDisconnectEvent e) {
-        log(e.getChip().getSocket().getRemoteSocketAddress().toString() + " Disconnected from server");
-        clientList.remove(e.getChip().getSocket().getRemoteSocketAddress().toString());
-    }
 
 
 

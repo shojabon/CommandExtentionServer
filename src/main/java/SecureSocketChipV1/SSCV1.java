@@ -35,6 +35,8 @@ public class SSCV1 implements SSCVCommand {
 
     HashMap<String, String> returnMap = new HashMap<>();
 
+    int permissionLevel = 0;
+
     public SSCV1(Socket socket, SSCV1Mode mode, SSCVCommand command, SSCEvent event) {
         if(event != null) eventHandler.add(event);
         if(command != null) this.commandHandler.add(command);
@@ -130,5 +132,13 @@ public class SSCV1 implements SSCVCommand {
 
     public void removeReturnMap(String key){
         returnMap.remove(key);
+    }
+
+    public int getPermissionLevel() {
+        return permissionLevel;
+    }
+
+    public void setPermissionLevel(int permissionLevel) {
+        this.permissionLevel = permissionLevel;
     }
 }
