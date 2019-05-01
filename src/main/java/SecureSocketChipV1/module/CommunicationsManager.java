@@ -87,6 +87,10 @@ public class CommunicationsManager{
         for(SSCEvent event: main.getEventHandler()){
             event.onClientDisconnect(new SSCClientDisconnectEvent(main));
         }
+        try {
+            main.getSocket().close();
+        } catch (IOException e) {
+        }
         communicationsOpen = false;
     }
 
